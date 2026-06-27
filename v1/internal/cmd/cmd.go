@@ -3,8 +3,8 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"os"
+	"text/template"
 )
 
 type Args struct {
