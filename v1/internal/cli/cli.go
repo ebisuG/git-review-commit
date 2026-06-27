@@ -12,13 +12,12 @@ type Args struct {
 	Body  string
 }
 
-func Parse() *Args {
-	return &Args{os.Args[2], os.Args[4]}
+func Parse() (*Args, error) {
+	if len(os.Args) != 5 {
+		return &Args{}, fmt.Errorf("invalid argument format")
+	}
+	return &Args{Title: os.Args[2], Body: os.Args[4]}, nil
 }
-
-//TODO:validate user's input format
-// func Validate() {
-// }
 
 type PromptData struct {
 	UserInput      string
@@ -27,19 +26,21 @@ type PromptData struct {
 }
 
 // For now use string, use template package when sending the request
-func PromptBuild() {
+func PromptBuild() (string, error) {
 	const userInput = `git commit -m "{{.Title}}" -m "{{.Body}}"`
-	// const userInput = " - Commit title:{{.Title}}\n - Commit message body:{{.Body}}"
 
 	input, err := template.New("input").Parse(userInput)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	var inputBuf bytes.Buffer
-	args := Parse()
+	args, err := Parse()
+	if err != nil {
+		return "", err
+	}
 	err = input.Execute(&inputBuf, *args)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	s := inputBuf.String()
 
@@ -55,14 +56,14 @@ func PromptBuild() {
 	const prompTemplate = "Main instruction:\n  {{.BasePrompt}}\nUser input:\n{{.UserInput}}\nOutput templates:\n{{.OutputTemplate}}"
 	prompt, err := template.New("prompt").Parse(prompTemplate)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	var promptBuf bytes.Buffer
 	err = prompt.Execute(&promptBuf, data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	t := promptBuf.String()
 	fmt.Println(t)
-
+	return t, nil
 }
