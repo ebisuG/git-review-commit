@@ -1,13 +1,11 @@
 package main
 
-import (
-	// "fmt"
+import "github.com/ebisuG/git-review-commit-v1/internal/cli"
 
-	"github.com/ebisuG/git-review-commit-v1/internal/cmd"
-)
+// "fmt"
 
 func main() {
 	// input := cmd.Parse()
 	// fmt.Println(*input)
-	cmd.PromptBuild()
+	cli.PromptBuild()
 }
