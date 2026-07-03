@@ -8,11 +8,11 @@ import (
 	"github.com/openai/openai-go/v3/responses"
 )
 
-func NewOpenAiClient(key string) OpenAiClient {
+func NewOpenAiClient(key string) *OpenAiClient {
 	client := OpenAiClient(openai.NewClient(
 		option.WithAPIKey(key),
 	))
-	return client
+	return &client
 }
 
 type OpenAiClient openai.Client
