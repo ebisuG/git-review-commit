@@ -71,6 +71,5 @@ func PromptBuild() (string, error) {
 		return "", err
 	}
 	t := promptBuf.String()
-	fmt.Println(t)
 	return t, nil
 }
