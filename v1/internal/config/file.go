@@ -27,7 +27,7 @@ func (y *YamlLoader) Load() (*Config, error) {
 		return &Config{}, err
 	}
 	var config Config
-	config.ApiKey = Config(yamlConfig).ApiKey
+	config = Config{ApiKey: yamlConfig.ApiKey}
 	return &config, nil
 }
 
