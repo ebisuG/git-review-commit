@@ -32,5 +32,5 @@ func NewClient(key string) ai.Reviewer {
 
 func NewLoader() config.Loader {
 	loader := config.NewYamlLoader("config.yaml")
-	return &loader
+	return loader
 }

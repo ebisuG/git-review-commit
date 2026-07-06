@@ -11,10 +11,12 @@ type YamlConfig struct {
 	ApiKey string `yaml:"API_KEY"`
 }
 
-type YamlPath string
+type YamlLoader struct {
+	path string
+}
 
-func (y *YamlPath) Load() (*Config, error) {
-	filename, _ := filepath.Abs(string(*y))
+func (y *YamlLoader) Load() (*Config, error) {
+	filename, _ := filepath.Abs(string(y.path))
 	yamlFile, err := os.ReadFile(filename)
 	if err != nil {
 		return &Config{}, err
@@ -29,8 +31,8 @@ func (y *YamlPath) Load() (*Config, error) {
 	return &config, nil
 }
 
-func NewYamlLoader(path string) YamlPath {
-	return YamlPath(path)
+func NewYamlLoader(path string) *YamlLoader {
+	return &YamlLoader{path: path}
 }
 
-var _ Loader = (*YamlPath)(nil)
+var _ Loader = (*YamlLoader)(nil)
