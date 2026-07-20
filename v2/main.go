@@ -18,7 +18,7 @@ func NewLoader() config.Loader {
 	return loader
 }
 
-func NewPrompt() string {
+func BuildPrompt() string {
 	promptData, err := prompt.NewPromptData()
 	if err != nil {
 		fmt.Println(err)
@@ -36,7 +36,7 @@ func main() {
 		fmt.Println(err)
 	}
 	reviewr := NewReviewer(config.ApiKey)
-	prompt := NewPrompt()
+	prompt := BuildPrompt()
 	result, err := reviewr.Review(prompt)
 	if err != nil {
 		fmt.Println(err)
