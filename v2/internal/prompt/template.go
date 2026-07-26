@@ -31,4 +31,9 @@ const prompTemplate = `## Main instruction :
 
 ## Output:
 
-{{.OutputTemplate}}`
+{{.OutputTemplate}}
+
+## GitLog:
+
+{{.GitLog}}
+`
