@@ -17,23 +17,28 @@ const outputTemplate = `### Simple correction
 ### More precise and concise
 - Improve clarity and conciseness while preserving the original intent and overall structure.
 
-### Guessed missing context
-- List any important information that seems to be omitted from the commit message.
-- If nothing appears to be missing, output ` + "`None`" + `.`
+### Review feedback
+- As an experienced software engineer, point out something that isn't clear enough to review user input.
+- For example, definition of words, background of decision or any intention of message.
+- If there is nothing to point out, output ` + "`None`" + `.`
 
-const prompTemplate = `## Main instruction :
+const prompTemplate = `
+Please review a git commit message draft.
+Below are instructions.
+
+## Your Role :
 
 {{.BasePrompt}}
 
-##User input:
+## What you should review:
 
 {{.UserInput}}
 
-## Output:
-
-{{.OutputTemplate}}
-
-## GitLog:
+## GitLog to Supply Background of Commit Message:
 
 {{.GitLog}}
+
+## Output Format:
+
+{{.OutputTemplate}}
 `
