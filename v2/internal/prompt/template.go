@@ -9,26 +9,35 @@ Review the commit message according to these priorities:
 1. Correct grammar, spelling, and unnatural English.
 2. Preserve the author's original phrasing and sentence structure as much as possible.
 3. Make the message concise only when it improves readability.
-4. Do not invent missing technical details. If important context appears to be missing, describe only what can be reasonably inferred.
+4. Ask questions about missing technical details. If important context appears to be missing, point it out in review feedback.
 `
 const outputTemplate = `### Simple correction
 - Make only the minimum changes necessary to produce natural English.
 
 ### More precise and concise
-- Improve clarity and conciseness while preserving the original intent and overall structure.
+- Improve clarity and conciseness while preserving the original intent and overall structure.`
 
-### Guessed missing context
-- List any important information that seems to be omitted from the commit message.
-- If nothing appears to be missing, output ` + "`None`" + `.`
+const prompTemplate = `
+Please review a git commit message draft.
+Below are instructions.
 
-const prompTemplate = `## Main instruction :
+## Your Role :
 
 {{.BasePrompt}}
 
-##User input:
+## Message You Should Review:
 
 {{.UserInput}}
 
-## Output:
+## Recent GitLog :
 
-{{.OutputTemplate}}`
+{{.GitLog}}
+
+## Output Formats You Should Follow:
+
+{{.OutputTemplate}}
+
+## Give Review feedback
+- As an experienced software engineer, point out something that isn't clear enough to review user input.
+- For example, definition of words, background of decision or any intention of message.
+- If there is nothing to point out, output ` + "`None`" + `.`

@@ -11,6 +11,7 @@ type PromptData struct {
 	UserInput      string
 	BasePrompt     string
 	OutputTemplate string
+	GitLog         string
 }
 
 func newUserInput() (string, error) {
@@ -37,7 +38,11 @@ func NewPromptData() (PromptData, error) {
 	if err != nil {
 		return PromptData{}, err
 	}
-	return PromptData{UserInput: userInput, BasePrompt: basePrompt, OutputTemplate: outputTemplate}, nil
+	gitLog, err := readGitLog()
+	if err != nil {
+		return PromptData{}, err
+	}
+	return PromptData{UserInput: userInput, BasePrompt: basePrompt, OutputTemplate: outputTemplate, GitLog: gitLog}, nil
 }
 
 func NewPrompt(data PromptData) (string, error) {
