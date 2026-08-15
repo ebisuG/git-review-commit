@@ -33,6 +33,9 @@ Below are instructions.
 
 {{.GitLog}}
 
+## Git Diff 
+{{.GitDiff}}
+
 ## Output Formats You Should Follow:
 
 {{.OutputTemplate}}
@@ -41,3 +44,14 @@ Below are instructions.
 - As an experienced software engineer, point out something that isn't clear enough to review user input.
 - For example, definition of words, background of decision or any intention of message.
 - If there is nothing to point out, output ` + "`None`" + `.`
+
+const diffTemplate = `
+### Diff in Git Staging
+{{.Diff}}
+
+### Files Including Changes
+{{range .ChangedFiles}}
+{{.Path}}
+{{.AllLines}}
+{{end}}
+`

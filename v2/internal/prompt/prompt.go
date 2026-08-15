@@ -2,6 +2,7 @@ package prompt
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/ebisuG/git-review-commit-v2/internal/cli"
@@ -12,6 +13,7 @@ type PromptData struct {
 	BasePrompt     string
 	OutputTemplate string
 	GitLog         string
+	GitDiff        string
 }
 
 func newUserInput() (string, error) {
@@ -33,6 +35,24 @@ func newUserInput() (string, error) {
 	return s, nil
 }
 
+func newDiff() (string, error) {
+	diff, err := buildDiff()
+	if err != nil {
+		fmt.Println("Cannot Find Git Diff")
+		return "", nil
+	}
+
+	templater, err := template.New("diff").Parse(diffTemplate)
+	var diffBuf bytes.Buffer
+	err = templater.Execute(&diffBuf, diff)
+	if err != nil {
+		fmt.Println("Cannot Output Git Diff")
+		return "", nil
+	}
+
+	return diffBuf.String(), nil
+}
+
 func NewPromptData() (PromptData, error) {
 	userInput, err := newUserInput()
 	if err != nil {
@@ -42,7 +62,12 @@ func NewPromptData() (PromptData, error) {
 	if err != nil {
 		return PromptData{}, err
 	}
-	return PromptData{UserInput: userInput, BasePrompt: basePrompt, OutputTemplate: outputTemplate, GitLog: gitLog}, nil
+	gitDiff, err := newDiff()
+	if err != nil {
+		fmt.Println("Cannot Get Git Diff")
+		fmt.Println(err)
+	}
+	return PromptData{UserInput: userInput, BasePrompt: basePrompt, OutputTemplate: outputTemplate, GitLog: gitLog, GitDiff: gitDiff}, nil
 }
 
 func NewPrompt(data PromptData) (string, error) {
