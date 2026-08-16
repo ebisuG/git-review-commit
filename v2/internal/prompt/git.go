@@ -77,12 +77,13 @@ func buildDiff() (Diff, error) {
 		return Diff{}, err
 	}
 
+	gitRoot, err := getGitRootPath()
+	if err != nil {
+		fmt.Println("Not Found Git Root Directory")
+	}
+
 	var changedFiles []ChangedFile
 	for _, v := range changedFilesPath {
-		gitRoot, err := getGitRootPath()
-		if err != nil {
-			fmt.Println("Not Found Current Directory")
-		}
 		path := filepath.Join(gitRoot, v)
 		content, err := os.ReadFile(path)
 		if err != nil {
