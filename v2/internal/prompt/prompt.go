@@ -16,18 +16,14 @@ type PromptData struct {
 	GitDiff        string
 }
 
-func newUserInput() (string, error) {
-	const userInput = cli.UserInput
-	input, err := template.New("input").Parse(userInput)
-	if err != nil {
-		return "", err
-	}
-	args, err := cli.Parse()
+func NewUserInput(command cli.Command) (string, error) {
+	const ct = cli.CommandTemplate
+	tmpl, err := template.New("input").Parse(ct)
 	if err != nil {
 		return "", err
 	}
 	var inputBuf bytes.Buffer
-	err = input.Execute(&inputBuf, *args)
+	err = tmpl.Execute(&inputBuf, command)
 	if err != nil {
 		return "", err
 	}
@@ -53,11 +49,7 @@ func newDiff() (string, error) {
 	return diffBuf.String(), nil
 }
 
-func NewPromptData() (PromptData, error) {
-	userInput, err := newUserInput()
-	if err != nil {
-		return PromptData{}, err
-	}
+func NewPromptData(userInput string) (PromptData, error) {
 	gitLog, err := readGitLog()
 	if err != nil {
 		return PromptData{}, err
