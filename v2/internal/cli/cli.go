@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
@@ -8,6 +9,79 @@ import (
 type Args struct {
 	Title string
 	Body  string
+}
+
+type Command struct {
+	Instruction string
+	Options     []Option
+}
+type Option struct {
+	Flag  string
+	Value string
+}
+
+type Interpreter interface {
+	Interpret(input []string) (Command, error)
+}
+
+type GitReviewInterpreter struct{}
+
+var _ Interpreter = (*GitReviewInterpreter)(nil)
+
+func NewGitReviewInterpreter() GitReviewInterpreter {
+	return GitReviewInterpreter{}
+}
+
+func (g *GitReviewInterpreter) Interpret(input []string) (Command, error) {
+	var options = []Option{
+		{Flag: input[1], Value: input[2]},
+		{Flag: input[3], Value: input[4]},
+	}
+	return Command{Instruction: input[0], Options: options}, nil
+}
+
+type Validater interface {
+	Validate(input []string) error
+}
+
+type GitReviewValidater struct{}
+
+var _ Validater = (*GitReviewValidater)(nil)
+
+func NewGitReviewValidater() GitReviewValidater {
+	return GitReviewValidater{}
+}
+
+func (v *GitReviewValidater) Validate(input []string) error {
+	if len(input) == 3 {
+		if input[1] != "-m" {
+			return errors.New("first flag is invalid")
+		}
+		if len(input[2]) == 0 {
+			return errors.New("At lease, write git commit message title")
+		}
+		return nil
+	}
+
+	if len(input) == 5 {
+		if input[1] != "-m" {
+			return errors.New("first flag is invalid")
+		}
+		if len(input[2]) == 0 {
+			return errors.New("At lease, write git commit message title")
+		}
+		if input[3] != "-m" {
+			return errors.New("second flag is invalid")
+		}
+		return nil
+	}
+	return errors.New("Follow format : git-review -m <title> -m <body>")
+}
+
+type GetInput func() []string
+
+func GetArgs() []string {
+	return os.Args
 }
 
 func ValidateArgs() error {
