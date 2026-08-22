@@ -30,16 +30,37 @@ func BuildPrompt() string {
 	return prompt
 }
 
-func main() {
-	config, err := NewLoader().Load()
+type App struct {
+	reviewer review.Reviewer
+	prompt   string
+}
+
+type Runner interface {
+	Run() error
+}
+
+func (a *App) Run() error {
+	result, err := a.reviewer.Review(a.prompt)
 	if err != nil {
 		fmt.Println(err)
-	}
-	reviewr := NewReviewer(config.ApiKey)
-	prompt := BuildPrompt()
-	result, err := reviewr.Review(prompt)
-	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	fmt.Println(result)
+	return nil
+}
+
+func NewApp(loader config.Loader) *App {
+	config, err := loader.Load()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return &App{reviewer: NewReviewer(config.ApiKey), prompt: BuildPrompt()}
+}
+
+var _ Runner = (*App)(nil)
+
+func main() {
+	loader := NewLoader()
+	app := NewApp(loader)
+	app.Run()
 }
