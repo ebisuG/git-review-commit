@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/ebisuG/git-review-commit-v2/internal/cli"
 	"github.com/ebisuG/git-review-commit-v2/internal/config"
 	"github.com/ebisuG/git-review-commit-v2/internal/prompt"
 	"github.com/ebisuG/git-review-commit-v2/internal/review"
@@ -18,8 +19,36 @@ func NewLoader() config.Loader {
 	return loader
 }
 
+func NewInterpreter() cli.Interpreter {
+	interpreter := cli.NewGitReviewInterpreter()
+	return &interpreter
+}
+
+func NewValidater() cli.Validater {
+	validater := cli.NewGitReviewValidater()
+	return &validater
+}
+
 func BuildPrompt() string {
-	promptData, err := prompt.NewPromptData()
+	input := cli.GetArgs()
+	validater := NewValidater()
+	err := validater.Validate(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	interpreter := NewInterpreter()
+	command, err := interpreter.Interpret(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	userDraft, err := prompt.NewUserInput(command)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	promptData, err := prompt.NewPromptData(userDraft)
 	if err != nil {
 		fmt.Println(err)
 	}
