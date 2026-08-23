@@ -29,19 +29,9 @@ func NewValidater() cli.Validater {
 	return &validater
 }
 
-func BuildPrompt() string {
-	input := cli.GetArgs()
-	validater := NewValidater()
-	err := validater.Validate(input)
-	if err != nil {
-		fmt.Println(err)
-	}
+type PromptBuilder func(command cli.Command) string
 
-	interpreter := NewInterpreter()
-	command, err := interpreter.Interpret(input)
-	if err != nil {
-		fmt.Println(err)
-	}
+func BuildPrompt(command cli.Command) string {
 
 	userDraft, err := prompt.NewUserInput(command)
 	if err != nil {
@@ -60,8 +50,10 @@ func BuildPrompt() string {
 }
 
 type App struct {
-	reviewer review.Reviewer
-	prompt   string
+	reviewer      review.Reviewer
+	promptBuilder PromptBuilder
+	interpreter   cli.Interpreter
+	validater     cli.Validater
 }
 
 type Runner interface {
@@ -69,7 +61,22 @@ type Runner interface {
 }
 
 func (a *App) Run() error {
-	result, err := a.reviewer.Review(a.prompt)
+	input := cli.GetArgs()
+	validater := NewValidater()
+	err := validater.Validate(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	interpreter := NewInterpreter()
+	command, err := interpreter.Interpret(input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	prompt := a.promptBuilder(command)
+
+	result, err := a.reviewer.Review(prompt)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -83,7 +90,13 @@ func NewApp(loader config.Loader) *App {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return &App{reviewer: NewReviewer(config.ApiKey), prompt: BuildPrompt()}
+
+	return &App{
+		reviewer:      NewReviewer(config.ApiKey),
+		promptBuilder: BuildPrompt,
+		interpreter:   NewInterpreter(),
+		validater:     NewValidater(),
+	}
 }
 
 var _ Runner = (*App)(nil)
