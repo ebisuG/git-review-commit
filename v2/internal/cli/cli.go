@@ -2,7 +2,6 @@ package cli
 
 import (
 	"errors"
-	"fmt"
 	"os"
 )
 
@@ -81,28 +80,8 @@ func (v *GitReviewValidater) Validate(input []string) error {
 	return errors.New("Follow format : git-review -m <title> -m <body>")
 }
 
-type GetInput func() []string
+// type GetInput func() []string
 
 func GetArgs() []string {
 	return os.Args
-}
-
-func ValidateArgs() error {
-	const argsInMMstyle = 5
-	argsLength := len(os.Args)
-	if argsLength < 5 {
-		return fmt.Errorf("less argument %d", argsLength)
-	} else if argsLength > 5 {
-		return fmt.Errorf("too many argument %d", argsLength)
-	} else {
-		return nil
-	}
-}
-
-func Parse() (*Args, error) {
-	err := ValidateArgs()
-	if err != nil {
-		return &Args{}, err
-	}
-	return &Args{Title: os.Args[2], Body: os.Args[4]}, nil
 }
