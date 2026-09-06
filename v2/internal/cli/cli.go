@@ -33,11 +33,14 @@ func NewGitReviewInterpreter() GitReviewInterpreter {
 }
 
 func (g *GitReviewInterpreter) Interpret(input []string) (Command, error) {
-	var options = []Option{
-		{Flag: input[1], Value: input[2]},
-		{Flag: input[3], Value: input[4]},
+	instruction := input[0]
+	options := input[1:]
+	var flagAndValues []Option
+	for i := 0; i < len(options)-1; i += 2 {
+		option := Option{Flag: input[i], Value: input[i+1]}
+		flagAndValues = append(flagAndValues, option)
 	}
-	return Command{Instruction: input[0], Options: options}, nil
+	return Command{Instruction: instruction, Options: flagAndValues}, nil
 }
 
 type Validater interface {
