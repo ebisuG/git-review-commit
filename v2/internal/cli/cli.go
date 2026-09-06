@@ -80,8 +80,6 @@ func (v *GitReviewValidater) Validate(input []string) error {
 	return errors.New("Follow format : git-review -m <title> -m <body>")
 }
 
-// type GetInput func() []string
-
 func GetArgs() []string {
 	return os.Args
 }
