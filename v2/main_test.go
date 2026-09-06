@@ -39,7 +39,7 @@ func NewMockApp(input []string) *App {
 type StubReviewer struct{}
 
 func (c *StubReviewer) Review(question string) (string, error) {
-	return "Dummy Review Message", nil
+	return "Called StubReviewer.Review", nil
 }
 
 var _ review.Reviewer = (*StubReviewer)(nil)
