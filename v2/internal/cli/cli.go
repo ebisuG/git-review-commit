@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"os"
+	"strings"
 )
 
 type Args struct {
@@ -35,11 +36,35 @@ func (g *GitReviewInterpreter) Interpret(input []string) (Command, error) {
 	instruction := input[0]
 	options := input[1:]
 	var flagAndValues []Option
-	for i := 0; i < len(options)-1; i += 2 {
-		option := Option{Flag: input[i], Value: input[i+1]}
+
+	//case for -m has both title and body
+	//ex) git-review -m "title:
+	//
+	//main body message 1
+	//main body message 2"
+	if len(options) == 2 {
+		strings.ReplaceAll(options[1], "\r\n", "\n")
+		if strings.Contains(options[1], "\n") {
+			title := strings.Split(options[1], "\n")[0]
+			body := strings.Split(options[1], "\n")[1]
+			formattedInput := []string{"-m", title, "-m", body}
+			flagAndValues = convertStringToOption(formattedInput)
+			return Command{Instruction: instruction, Options: flagAndValues}, nil
+		}
+	}
+
+	//case for -m <title> and -m <body> pattern
+	flagAndValues = convertStringToOption(options)
+	return Command{Instruction: instruction, Options: flagAndValues}, nil
+}
+
+func convertStringToOption(s []string) []Option {
+	var flagAndValues []Option
+	for i := 0; i < len(s)-1; i += 2 {
+		option := Option{Flag: s[i], Value: s[i+1]}
 		flagAndValues = append(flagAndValues, option)
 	}
-	return Command{Instruction: instruction, Options: flagAndValues}, nil
+	return flagAndValues
 }
 
 type Validater interface {
