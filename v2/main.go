@@ -54,6 +54,7 @@ type App struct {
 	promptBuilder PromptBuilder
 	interpreter   cli.Interpreter
 	validater     cli.Validater
+	input         []string
 }
 
 type Runner interface {
@@ -61,15 +62,14 @@ type Runner interface {
 }
 
 func (a *App) Run() error {
-	input := cli.GetArgs()
 	validater := NewValidater()
-	err := validater.Validate(input)
+	err := validater.Validate(a.input)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	interpreter := NewInterpreter()
-	command, err := interpreter.Interpret(input)
+	command, err := interpreter.Interpret(a.input)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -96,6 +96,7 @@ func NewApp(loader config.Loader) *App {
 		promptBuilder: BuildPrompt,
 		interpreter:   NewInterpreter(),
 		validater:     NewValidater(),
+		input:         cli.GetArgs(),
 	}
 }
 
