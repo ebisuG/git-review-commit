@@ -40,13 +40,20 @@ func (g *GitReviewInterpreter) Interpret(input []string) (Command, error) {
 	//case for -m has both title and body
 	//ex) git-review -m "title:
 	//
-	//main body message 1
-	//main body message 2"
+	//main body message 1.
+	//main body message 2."
 	if len(options) == 2 {
-		strings.ReplaceAll(options[1], "\r\n", "\n")
-		if strings.Contains(options[1], "\n") {
-			title := strings.Split(options[1], "\n")[0]
-			body := strings.Split(options[1], "\n")[1]
+		message := options[1]
+		strings.ReplaceAll(message, "\r\n", "\n")
+		if strings.Contains(message, "\n") {
+			lines := strings.Split(message, "\n")
+			title := lines[0]
+			var body string
+			for _, v := range lines[1:] {
+				if v != "" {
+					body = body + v + " "
+				}
+			}
 			formattedInput := []string{"-m", title, "-m", body}
 			flagAndValues = convertStringToOption(formattedInput)
 			return Command{Instruction: instruction, Options: flagAndValues}, nil
