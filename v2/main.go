@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/ebisuG/git-review-commit-v2/internal/cli"
 	"github.com/ebisuG/git-review-commit-v2/internal/config"
 	"github.com/ebisuG/git-review-commit-v2/internal/prompt"
 	"github.com/ebisuG/git-review-commit-v2/internal/review"
@@ -18,8 +19,26 @@ func NewLoader() config.Loader {
 	return loader
 }
 
-func BuildPrompt() string {
-	promptData, err := prompt.NewPromptData()
+func NewInterpreter() cli.Interpreter {
+	interpreter := cli.NewGitReviewInterpreter()
+	return &interpreter
+}
+
+func NewValidater() cli.Validater {
+	validater := cli.NewGitReviewValidater()
+	return &validater
+}
+
+type PromptBuilder func(command cli.Command) string
+
+func BuildPrompt(command cli.Command) string {
+
+	userDraft, err := prompt.NewUserInput(command)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	promptData, err := prompt.NewPromptData(userDraft)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -31,8 +50,11 @@ func BuildPrompt() string {
 }
 
 type App struct {
-	reviewer review.Reviewer
-	prompt   string
+	reviewer      review.Reviewer
+	promptBuilder PromptBuilder
+	interpreter   cli.Interpreter
+	validater     cli.Validater
+	input         []string
 }
 
 type Runner interface {
@@ -40,7 +62,21 @@ type Runner interface {
 }
 
 func (a *App) Run() error {
-	result, err := a.reviewer.Review(a.prompt)
+	validater := NewValidater()
+	err := validater.Validate(a.input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	interpreter := NewInterpreter()
+	command, err := interpreter.Interpret(a.input)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	prompt := a.promptBuilder(command)
+
+	result, err := a.reviewer.Review(prompt)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -54,7 +90,14 @@ func NewApp(loader config.Loader) *App {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return &App{reviewer: NewReviewer(config.ApiKey), prompt: BuildPrompt()}
+
+	return &App{
+		reviewer:      NewReviewer(config.ApiKey),
+		promptBuilder: BuildPrompt,
+		interpreter:   NewInterpreter(),
+		validater:     NewValidater(),
+		input:         cli.GetArgs(),
+	}
 }
 
 var _ Runner = (*App)(nil)
