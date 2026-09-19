@@ -40,6 +40,6 @@ func TestGitReviewInterpreterInterpret(t *testing.T) {
 
 		t.Errorf("Failed to parse options.")
 	}
-	fmt.Println("command : ", command)
+	fmt.Println("interpreted command : ", command)
 
 }
