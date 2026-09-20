@@ -13,6 +13,17 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            goarch: amd64
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: arm64      
     steps:
     - uses: actions/checkout@v4
 
@@ -23,10 +34,22 @@ jobs:
 
     - name: Change current directory to v2
       run: cd v2
-      run: echo "current directory: " $(pwd)    
+      run: echo 'current directory: ' $(pwd)
 
     - name: Test
       run: go test -v ./...
 
     - name: Build
-      run: go build -v ./...
+      env:
+        GOOS:${{matrix.goos}}
+        GOARCH:${{matrix.goarch}}
+      run: |
+        mkdir -p dist
+        EXT=""
+        if [ "${{ matrix.goos }}" = "windows" ]; then EXT=".exe"; fi
+        go build -o dist/git-review-commit-${{ matrix.goos }}-${{ matrix.goarch }}${EXT} .
+      
+    - uses: actions/upload-artifact@v7
+      with:
+        name: myapp-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: dist/*
