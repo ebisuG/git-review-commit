@@ -52,5 +52,5 @@ jobs:
       
     - uses: actions/upload-artifact@v7
       with:
-        name: myapp-${{ matrix.goos }}-${{ matrix.goarch }}
+        name: git-review-commit-${{ matrix.goos }}-${{ matrix.goarch }}
         path: dist/*
