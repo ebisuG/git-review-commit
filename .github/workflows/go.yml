@@ -33,7 +33,7 @@ jobs:
         go-version: '1.22'
 
     - name: Change current directory to v2
-      run:| 
+      run: |
         cd v2
         echo 'current directory: ' $(pwd)
 
