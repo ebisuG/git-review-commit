@@ -34,7 +34,8 @@ jobs:
 
     - name: Change current directory to v2
       run: cd v2
-      run: echo 'current directory: ' $(pwd)
+      run: |
+        echo 'current directory: ' $(pwd)
 
     - name: Test
       run: go test -v ./...
