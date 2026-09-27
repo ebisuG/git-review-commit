@@ -61,4 +61,4 @@ jobs:
     - uses: actions/upload-artifact@v7
       with:
         name: git-review-commit-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: dist/*
+        path: v2/dist/*
