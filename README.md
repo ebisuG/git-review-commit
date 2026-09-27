@@ -8,3 +8,10 @@ I know that these days, the need to write code manually is decreasing. However, 
 
 
 ## How to Use
+1. Download the executable file from **GitHub Releases**.
+2. Place the executable file in your `PATH`.
+3. Rename the file as you like, following the `git-<command>` format.
+4. Set your API key and model name in `config.yaml`. Place the file next to the executable.
+5. Run `git <command>` in your local Git repository. Git will automatically find the command using the name you specified in step 3.
+
+See : https://git-scm.com/docs/git#Documentation/git.txt-PATH
