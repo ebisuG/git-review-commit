@@ -12,12 +12,28 @@ type YamlConfig struct {
 }
 
 type YamlLoader struct {
-	path string
+	fileName string
+}
+
+func findConfigDir() (string, error) {
+	toolLocatedPath, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	toolLocatedPath, err = filepath.EvalSymlinks(toolLocatedPath)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Dir(toolLocatedPath), nil
 }
 
 func (y *YamlLoader) Load() (*Config, error) {
-	filename, _ := filepath.Abs(string(y.path))
-	yamlFile, err := os.ReadFile(filename)
+	configDir, err := findConfigDir()
+	if err != nil {
+		return &Config{}, err
+	}
+
+	yamlFile, err := os.ReadFile(filepath.Join(configDir, y.fileName))
 	if err != nil {
 		return &Config{}, err
 	}
@@ -31,8 +47,8 @@ func (y *YamlLoader) Load() (*Config, error) {
 	return &config, nil
 }
 
-func NewYamlLoader(path string) *YamlLoader {
-	return &YamlLoader{path: path}
+func NewYamlLoader(fileName string) *YamlLoader {
+	return &YamlLoader{fileName: fileName}
 }
 
 var _ Loader = (*YamlLoader)(nil)
