@@ -4,19 +4,20 @@ import (
 	"fmt"
 	"strings"
 
+	anyllm "github.com/mozilla-ai/any-llm-go"
 	"github.com/mozilla-ai/any-llm-go/providers"
 	"github.com/mozilla-ai/any-llm-go/providers/anthropic"
 	"github.com/mozilla-ai/any-llm-go/providers/openai"
 )
 
-type factory func() (providers.Provider, error)
+type factory func(apiKey string) (providers.Provider, error)
 
 var registry = map[string]factory{
-	"openai":    func() (providers.Provider, error) { return openai.New() },
-	"anthropic": func() (providers.Provider, error) { return anthropic.New() },
+	"openai":    func(apiKey string) (providers.Provider, error) { return openai.New(anyllm.WithAPIKey(apiKey)) },
+	"anthropic": func(apiKey string) (providers.Provider, error) { return anthropic.New(anyllm.WithAPIKey(apiKey)) },
 }
 
-func Resolve(spec string) (providers.Provider, string, error) {
+func Resolve(spec string, apiKey string) (providers.Provider, string, error) {
 	//spec is supposed to be provider/model format
 	name, model, ok := strings.Cut(spec, "/")
 	if !ok {
@@ -28,7 +29,7 @@ func Resolve(spec string) (providers.Provider, string, error) {
 		return nil, "", fmt.Errorf("unknown provider %q", name)
 	}
 
-	p, err := f()
+	p, err := f(apiKey)
 	if err != nil {
 		return nil, "", err
 	}
