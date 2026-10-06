@@ -14,7 +14,7 @@ func NewReviewer(loader config.Loader) review.Reviewer {
 	if err != nil {
 		return nil
 	}
-	p, model, err := Resolve(conf.ProviderAndModel)
+	p, model, err := Resolve(conf.ProviderAndModel, conf.ApiKey)
 	return &LlmClient{params: anyllm.CompletionParams{Model: model}, provider: p}
 }
 
