@@ -9,13 +9,21 @@ import (
 	"github.com/mozilla-ai/any-llm-go/providers"
 )
 
-func NewReviewer(loader config.Loader) review.Reviewer {
+func NewReviewer(loader config.Loader) (review.Reviewer, error) {
+	//TODO:refine returned error
 	conf, err := loader.Load()
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	p, model, err := Resolve(conf.ProviderAndModel, conf.ApiKey)
-	return &LlmClient{params: anyllm.CompletionParams{Model: model}, provider: p}
+	if err != nil {
+		return nil, err
+	}
+
+	return &LlmClient{
+			params:   anyllm.CompletionParams{Model: model},
+			provider: p},
+		nil
 }
 
 type LlmClient struct {
