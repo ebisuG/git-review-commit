@@ -1,34 +1,50 @@
 package llm
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/ebisuG/git-review-commit-v2/internal/config"
+	"github.com/joho/godotenv"
 )
 
 func TestNewAnyLlmGoReviewer(t *testing.T) {
 	openaiLoader := NewOpenaiStubLoader()
-	_, err := NewAnyLlmGoReviewer(openaiLoader)
+	openAiReviewer, err := NewAnyLlmGoReviewer(openaiLoader)
 	if err != nil {
-		t.Errorf("failed to resolve openai/ChatModelGPT5_4Mini : %v", err)
+		t.Errorf("failed to resolve openai/gpt-5.4-mini : %v", err)
 	}
+	res, err := openAiReviewer.Review("Say hello, and what is your name?")
+	if err != nil {
+		t.Errorf("execution of review failed : %v", err)
+	}
+	fmt.Println("OpenAI : ", res)
 
 	anthropicLoader := NewAnthropicStubLoader()
-	_, err = NewAnyLlmGoReviewer(anthropicLoader)
+	anthropicReviewer, err := NewAnyLlmGoReviewer(anthropicLoader)
 	if err != nil {
-		t.Errorf("failed to resolve anthropic/ModelClaudeHaiku5_5 : %v", err)
+		t.Errorf("failed to resolve anthropic/claude-haiku-5-5 : %v", err)
 	}
+	res, err = anthropicReviewer.Review("Say hello, and what is your name??")
+	if err != nil {
+		t.Errorf("execution of review failed : %v", err)
+	}
+	fmt.Println("Anthropic : ", res)
 }
 
 type OpenaiStubLoader struct{}
 type AnthropicStubLoader struct{}
 
 func (*OpenaiStubLoader) Load() (*config.Config, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return &config.Config{}, fmt.Errorf("failed loading .env : %v", err)
+	}
 	key := os.Getenv("OPENAI_API_KEY")
 	conf := config.Config{
 		ApiKey:           key,
-		ProviderAndModel: "openai/ChatModelGPT5_4Mini",
+		ProviderAndModel: "openai/gpt-5.4-mini",
 	}
 	return &conf, nil
 }
@@ -40,10 +56,14 @@ func NewOpenaiStubLoader() config.Loader {
 }
 
 func (*AnthropicStubLoader) Load() (*config.Config, error) {
+	err := godotenv.Load()
+	if err != nil {
+		return &config.Config{}, fmt.Errorf("failed loading .env : %v", err)
+	}
 	key := os.Getenv("ANTHROPIC_API_KEY")
 	conf := config.Config{
 		ApiKey:           key,
-		ProviderAndModel: "anthropic/ModelClaudeHaiku5_5",
+		ProviderAndModel: "anthropic/claude-haiku-5-5",
 	}
 	return &conf, nil
 }
