@@ -4,6 +4,7 @@ go 1.26.8
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.26.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mozilla-ai/any-llm-go v0.9.0 // indirect
 	github.com/openai/openai-go v1.12.0 // indirect
 	github.com/openai/openai-go/v3 v3.44.0 // indirect
