@@ -8,7 +8,8 @@ import (
 )
 
 type YamlConfig struct {
-	ApiKey string `yaml:"API_KEY"`
+	ApiKey           string `yaml:"API_KEY"`
+	ProviderAndModel string `yaml:"PROVIDER_AND_MODEL"`
 }
 
 type YamlLoader struct {
@@ -43,7 +44,7 @@ func (y *YamlLoader) Load() (*Config, error) {
 		return &Config{}, err
 	}
 	var config Config
-	config = Config{ApiKey: yamlConfig.ApiKey}
+	config = Config{ApiKey: yamlConfig.ApiKey, ProviderAndModel: yamlConfig.ProviderAndModel}
 	return &config, nil
 }
 

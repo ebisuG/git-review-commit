@@ -7,5 +7,6 @@ type Loader interface {
 }
 
 type Config struct {
-	ApiKey string
+	ApiKey           string
+	ProviderAndModel string
 }

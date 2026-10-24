@@ -5,13 +5,17 @@ import (
 
 	"github.com/ebisuG/git-review-commit-v2/internal/cli"
 	"github.com/ebisuG/git-review-commit-v2/internal/config"
+	"github.com/ebisuG/git-review-commit-v2/internal/llm"
 	"github.com/ebisuG/git-review-commit-v2/internal/prompt"
 	"github.com/ebisuG/git-review-commit-v2/internal/review"
 )
 
-func NewReviewer(key string) review.Reviewer {
-	client := review.NewOpenAiClient(key)
-	return client
+func NewReviewer(conf config.Loader) review.Reviewer {
+	reviewer, err := llm.NewAnyLlmGoReviewer(conf)
+	if err != nil {
+		fmt.Errorf("failed to get a reviewer : %v", err)
+	}
+	return reviewer
 }
 
 func NewLoader() config.Loader {
@@ -86,13 +90,9 @@ func (a *App) Run() error {
 }
 
 func NewApp(loader config.Loader) *App {
-	config, err := loader.Load()
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	return &App{
-		reviewer:      NewReviewer(config.ApiKey),
+		reviewer:      NewReviewer(loader),
 		promptBuilder: BuildPrompt,
 		interpreter:   NewInterpreter(),
 		validater:     NewValidater(),
