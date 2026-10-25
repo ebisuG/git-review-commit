@@ -10,7 +10,15 @@ import (
 	anyllm "github.com/mozilla-ai/any-llm-go"
 	"github.com/mozilla-ai/any-llm-go/providers"
 	"github.com/mozilla-ai/any-llm-go/providers/anthropic"
+	"github.com/mozilla-ai/any-llm-go/providers/deepseek"
+	"github.com/mozilla-ai/any-llm-go/providers/gemini"
+	"github.com/mozilla-ai/any-llm-go/providers/groq"
+	"github.com/mozilla-ai/any-llm-go/providers/llamacpp"
+	"github.com/mozilla-ai/any-llm-go/providers/llamafile"
+	"github.com/mozilla-ai/any-llm-go/providers/mistral"
+	"github.com/mozilla-ai/any-llm-go/providers/ollama"
 	"github.com/mozilla-ai/any-llm-go/providers/openai"
+	"github.com/mozilla-ai/any-llm-go/providers/zai"
 )
 
 type factory func(apiKey string) (providers.Provider, error)
@@ -18,6 +26,14 @@ type factory func(apiKey string) (providers.Provider, error)
 var registry = map[string]factory{
 	"openai":    func(apiKey string) (providers.Provider, error) { return openai.New(anyllm.WithAPIKey(apiKey)) },
 	"anthropic": func(apiKey string) (providers.Provider, error) { return anthropic.New(anyllm.WithAPIKey(apiKey)) },
+	"gemini":    func(apiKey string) (providers.Provider, error) { return gemini.New(anyllm.WithAPIKey(apiKey)) },
+	"mistral":   func(apiKey string) (providers.Provider, error) { return mistral.New(anyllm.WithAPIKey(apiKey)) },
+	"deepseek":  func(apiKey string) (providers.Provider, error) { return deepseek.New(anyllm.WithAPIKey(apiKey)) },
+	"groq":      func(apiKey string) (providers.Provider, error) { return groq.New(anyllm.WithAPIKey(apiKey)) },
+	"zai":       func(apiKey string) (providers.Provider, error) { return zai.New(anyllm.WithAPIKey(apiKey)) },
+	"ollama":    func(_ string) (providers.Provider, error) { return ollama.New() },
+	"llamacpp":  func(_ string) (providers.Provider, error) { return llamacpp.New() },
+	"llamafile": func(_ string) (providers.Provider, error) { return llamafile.New() },
 }
 
 func Resolve(spec string, apiKey string) (providers.Provider, string, error) {
