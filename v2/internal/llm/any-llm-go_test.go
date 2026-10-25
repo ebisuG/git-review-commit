@@ -40,7 +40,7 @@ type AnthropicStubLoader struct{}
 func (*OpenaiStubLoader) Load() (*config.Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("failed loading .env : %w", err)
+		log.Printf("failed loading .env : %v", err)
 	}
 	key, ok := os.LookupEnv("OPENAI_API_KEY")
 	if !ok || key == "" {
@@ -62,7 +62,7 @@ func NewOpenaiStubLoader() config.Loader {
 func (*AnthropicStubLoader) Load() (*config.Config, error) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Printf("failed loading .env : %w", err)
+		log.Printf("failed loading .env : %v", err)
 	}
 	key, ok := os.LookupEnv("ANTHROPIC_API_KEY")
 	if !ok || key == "" {
