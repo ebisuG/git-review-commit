@@ -14,22 +14,22 @@ func TestNewAnyLlmGoReviewer(t *testing.T) {
 	openaiLoader := NewOpenaiStubLoader()
 	openAiReviewer, err := NewAnyLlmGoReviewer(openaiLoader)
 	if err != nil {
-		t.Errorf("failed to resolve openai/gpt-5.4-mini : %w", err)
+		t.Errorf("failed to resolve openai/gpt-5.4-mini : %v", err)
 	}
 	res, err := openAiReviewer.Review("Say hello, and what is your name?")
 	if err != nil {
-		t.Errorf("execution of review failed : %w", err)
+		t.Errorf("execution of review failed : %v", err)
 	}
 	fmt.Println("OpenAI : ", res)
 
 	anthropicLoader := NewAnthropicStubLoader()
 	anthropicReviewer, err := NewAnyLlmGoReviewer(anthropicLoader)
 	if err != nil {
-		t.Errorf("failed to resolve anthropic/claude-haiku-5-5 : %w", err)
+		t.Errorf("failed to resolve anthropic/claude-haiku-5-5 : %v", err)
 	}
 	res, err = anthropicReviewer.Review("Say hello, and what is your name??")
 	if err != nil {
-		t.Errorf("execution of review failed : %w", err)
+		t.Errorf("execution of review failed : %v", err)
 	}
 	fmt.Println("Anthropic : ", res)
 }
