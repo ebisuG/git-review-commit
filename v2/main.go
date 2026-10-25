@@ -66,14 +66,12 @@ type Runner interface {
 }
 
 func (a *App) Run() error {
-	validater := NewValidater()
-	err := validater.Validate(a.input)
+	err := a.validater.Validate(a.input)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	interpreter := NewInterpreter()
-	command, err := interpreter.Interpret(a.input)
+	command, err := a.interpreter.Interpret(a.input)
 	if err != nil {
 		fmt.Println(err)
 	}
