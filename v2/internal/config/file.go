@@ -13,7 +13,8 @@ type YamlConfig struct {
 }
 
 type YamlLoader struct {
-	fileName string
+	yamlFileName        string
+	reviewStyleFileName string
 }
 
 func findConfigDir() (string, error) {
@@ -34,7 +35,7 @@ func (y *YamlLoader) Load() (*Config, error) {
 		return &Config{}, err
 	}
 
-	yamlFile, err := os.ReadFile(filepath.Join(configDir, y.fileName))
+	yamlFile, err := os.ReadFile(filepath.Join(configDir, y.yamlFileName))
 	if err != nil {
 		return &Config{}, err
 	}
@@ -43,13 +44,21 @@ func (y *YamlLoader) Load() (*Config, error) {
 	if err != nil {
 		return &Config{}, err
 	}
+
+	reviewStyleByte, err := os.ReadFile(filepath.Join(configDir, y.reviewStyleFileName))
+	if err != nil {
+		return &Config{}, err
+	}
+
+	reviewStyle := string(reviewStyleByte)
+
 	var config Config
-	config = Config{ApiKey: yamlConfig.ApiKey, ProviderAndModel: yamlConfig.ProviderAndModel}
+	config = Config{ApiKey: yamlConfig.ApiKey, ProviderAndModel: yamlConfig.ProviderAndModel, ReviewStyle: reviewStyle}
 	return &config, nil
 }
 
-func NewYamlLoader(fileName string) *YamlLoader {
-	return &YamlLoader{fileName: fileName}
+func NewYamlLoader(yamlFileName string, reviewStyleFileName string) *YamlLoader {
+	return &YamlLoader{yamlFileName: yamlFileName, reviewStyleFileName: reviewStyleFileName}
 }
 
 var _ Loader = (*YamlLoader)(nil)

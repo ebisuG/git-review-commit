@@ -15,7 +15,7 @@ func TestFindConfig(t *testing.T) {
 }
 
 func TestNewYamlLoader(t *testing.T) {
-	loader := NewYamlLoader("config.yaml")
+	loader := NewYamlLoader("config.yaml", "review-style.txt")
 	_, err := loader.Load()
 	if err != nil {
 		t.Log("test succeeded because there is no config.yaml file")

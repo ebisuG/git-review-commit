@@ -4,31 +4,19 @@ import (
 	"bytes"
 	"fmt"
 	"text/template"
-
-	"github.com/ebisuG/git-review-commit-v2/internal/cli"
 )
 
 type PromptData struct {
-	UserInput      string
+	UserInput      UserInput
 	BasePrompt     string
 	OutputTemplate string
 	GitLog         string
 	GitDiff        string
 }
 
-func NewUserInput(command cli.Command) (string, error) {
-	const ct = cli.CommandTemplate
-	tmpl, err := template.New("input").Parse(ct)
-	if err != nil {
-		return "", err
-	}
-	var inputBuf bytes.Buffer
-	err = tmpl.Execute(&inputBuf, command)
-	if err != nil {
-		return "", err
-	}
-	s := inputBuf.String()
-	return s, nil
+type UserInput struct {
+	UserDraft                string
+	UserPreferredReviewStyle string
 }
 
 func newDiff() (string, error) {
@@ -49,7 +37,7 @@ func newDiff() (string, error) {
 	return diffBuf.String(), nil
 }
 
-func NewPromptData(userInput string) (PromptData, error) {
+func NewPromptData(userInput UserInput) (PromptData, error) {
 	gitLog, err := readGitLog()
 	if err != nil {
 		return PromptData{}, err
@@ -59,6 +47,8 @@ func NewPromptData(userInput string) (PromptData, error) {
 		fmt.Println("Cannot Get Git Diff")
 		fmt.Println(err)
 	}
+
+	//read user preffered prompt and add it to PromptData
 	return PromptData{UserInput: userInput, BasePrompt: basePrompt, OutputTemplate: outputTemplate, GitLog: gitLog, GitDiff: gitDiff}, nil
 }
 

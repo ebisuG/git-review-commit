@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"text/template"
 
 	"github.com/ebisuG/git-review-commit-v2/internal/cli"
 	"github.com/ebisuG/git-review-commit-v2/internal/config"
@@ -19,7 +21,7 @@ func NewReviewer(conf config.Loader) review.Reviewer {
 }
 
 func NewLoader() config.Loader {
-	loader := config.NewYamlLoader("config.yaml")
+	loader := config.NewYamlLoader("config.yaml", "review-style.txt")
 	return loader
 }
 
@@ -33,11 +35,36 @@ func NewValidater() cli.Validater {
 	return &validater
 }
 
-type PromptBuilder func(command cli.Command) string
+func NewUserInput(command cli.Command, loader config.Loader) (prompt.UserInput, error) {
+	const ct = cli.CommandTemplate
+	tmpl, err := template.New("input").Parse(ct)
+	if err != nil {
+		return prompt.UserInput{}, err
+	}
+	var inputBuf bytes.Buffer
+	err = tmpl.Execute(&inputBuf, command)
+	if err != nil {
+		return prompt.UserInput{}, err
+	}
+	s := inputBuf.String()
 
-func BuildPrompt(command cli.Command) string {
+	conf, err := loader.Load()
 
-	userDraft, err := prompt.NewUserInput(command)
+	if err != nil {
+		return prompt.UserInput{}, err
+	}
+
+	var userInput prompt.UserInput
+	userInput.UserDraft = s
+	userInput.UserDraft = conf.ReviewStyle
+	return userInput, nil
+}
+
+type PromptBuilder func(command cli.Command, loader config.Loader) string
+
+func BuildPrompt(command cli.Command, loader config.Loader) string {
+
+	userDraft, err := NewUserInput(command, loader)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -59,6 +86,7 @@ type App struct {
 	interpreter   cli.Interpreter
 	validater     cli.Validater
 	input         []string
+	loader        config.Loader
 }
 
 type Runner interface {
@@ -76,7 +104,7 @@ func (a *App) Run() error {
 		fmt.Println(err)
 	}
 
-	prompt := a.promptBuilder(command)
+	prompt := a.promptBuilder(command, a.loader)
 
 	result, err := a.reviewer.Review(prompt)
 	if err != nil {
@@ -87,7 +115,8 @@ func (a *App) Run() error {
 	return nil
 }
 
-func NewApp(loader config.Loader) *App {
+func NewApp() *App {
+	loader := NewLoader()
 
 	return &App{
 		reviewer:      NewReviewer(loader),
@@ -95,13 +124,13 @@ func NewApp(loader config.Loader) *App {
 		interpreter:   NewInterpreter(),
 		validater:     NewValidater(),
 		input:         cli.GetArgs(),
+		loader:        loader,
 	}
 }
 
 var _ Runner = (*App)(nil)
 
 func main() {
-	loader := NewLoader()
-	app := NewApp(loader)
+	app := NewApp()
 	app.Run()
 }

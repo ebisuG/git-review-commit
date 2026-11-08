@@ -9,4 +9,5 @@ type Loader interface {
 type Config struct {
 	ApiKey           string
 	ProviderAndModel string
+	ReviewStyle      string
 }
